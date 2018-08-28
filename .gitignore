@@ -1,3 +1,8 @@
+./CMakeFiles
+
+CMakeCache.txt
+
+*.cmake
 *.exe
 *.dev
 *.layout
