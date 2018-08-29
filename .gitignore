@@ -1,9 +1,9 @@
 CMakeFiles
-
 CMakeCache.txt
+Makefile
 
+*.swp
 *.cmake
-*.exe
 *.dev
 *.layout
 *.win

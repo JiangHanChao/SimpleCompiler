@@ -10,3 +10,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./build/)
 
 add_executable(Compiler ${DIR_SRCS})
 
+add_definitions(-std=c++11)
+
+add_executable(spm spm.cpp)
