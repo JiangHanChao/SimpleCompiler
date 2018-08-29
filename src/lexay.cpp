@@ -16,7 +16,7 @@ static char linestring[LINESTRINGLEN];
 int Lexay::getChar(){
 	while(linepos >= linelen){
 		linenum++;
-		if(std::getline((*source), currline)){
+		if(std::getline((*source), currline, '\n')){
 			linelen = currline.size();
 			linepos = 0;
 			size_t pos = currline.find("//");
