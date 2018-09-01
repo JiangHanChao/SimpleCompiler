@@ -1,5 +1,12 @@
 	.file	linux-test.sm
-	.comment	
+	.comment
 **	Simple Compilation Compiler Code
 **	File standard infomation comment
 **	Standard Infomation comment End
+	.code
+001	MOV	$0,	%eax
+002	LOD	%eip
+003	MOV	$0,	%ebp
+004	MOV	$0,	%esp
+005	RET
+006	HALT	$0,	$0

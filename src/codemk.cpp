@@ -11,11 +11,12 @@ void Codemk::setFilename(string* name){
 
 void Codemk::CodeGEN(SyntaxNode* tree){
 	emitInfo(".file\t"+(*codename));
-	emitInfo(".comment\t");
+	emitInfo(".comment");
 	emitComment("Simple Compilation Compiler Code");
 	emitComment("File standard infomation comment");
 	
 	emitComment("Standard Infomation comment End");
+	emitInfo(".code");
 }
 
 void Codemk::emitInfo(string msg){
