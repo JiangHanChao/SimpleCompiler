@@ -1,0 +1,6 @@
+	.file	win-test.sm
+	.comment
+**	Simple Compilation Compiler Code
+**	File standard infomation comment
+**	Standard Infomation comment End
+	.code
