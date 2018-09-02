@@ -14,14 +14,14 @@ int main(int argc, char** argv) {
 	short enableInfo = 1; // 0; wirte infomation to destination code
 	int flag = (printoken<<8)+(printree<<9)+(printable<<10)+(printrace<<11)+(enableInfo<<12);
 	ifstream fp;
-	string codename;
-	string filename = argv[1];
+	string codename,filename;
 	SimpleCompiler compiler;
 	
 	if(argc!=2){
 		cout<<"usage: "<<argv[0]<<" <filename>"<<endl;
 		exit(1);
 	}
+	filename = argv[1];
 	
 	if(filename.find(".") == string::npos){
 		codename = filename+".sm";

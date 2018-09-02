@@ -14,7 +14,7 @@ const static int regs_size = 7;
 const static int insc_size = 13;
 
 enum RegType {
-	EAX=0, EBX, ECX, EDX, EBP, ESP, ENM=6
+	EAX=0, EBX, ECX, EDX, EBP, ESP, EIP, ENM=7
 };
 enum INSCTYPE {
 	MOV=0, LOD, ADD, SUB, MUL, DIV, SHF, SHR, JMP, LEA, RET, HALT, LEAVE=12
@@ -285,7 +285,7 @@ int main(int argc, char const *argv[])
 		return 3;
 	}
 
-	cout<<"SPM simulation start..."<<endl;
+	cout<<endl<<"...SPM simulation start..."<<endl;
 	cout<<">>> (enter h for cmd help)"<<endl;
 	bool done = true;
 	do{
