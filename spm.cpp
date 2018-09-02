@@ -125,7 +125,7 @@ public:
 		return true;
 	}
 protected:
-	bool match(string& src, string& rule){
+	bool match(string& src, string rule){
 		if (src.empty() || rule.empty()){
 			return false;
 		}
@@ -134,7 +134,7 @@ protected:
 		if (len < rlen){
 			return false;
 		}
-		int i = 0
+		int i = 0;
 		for (; i<len && i<rlen; ++i){
 			if (src[i]!=rule[i]){
 				break;
@@ -173,18 +173,25 @@ protected:
 				if (ins[0]=='$'){
 					num1 = atoi(ins.substr(1,fpos-1).c_str());
 					reg1 = ENM;
+				}else if(ins[0]=='%'){
+					num1 = 0;
+					reg1 = readReg(ins);
 				}else{
 					size_t lpos = ins.find('(');
-					num1 = aoti(ins.substr(0,lpos).c_str());
+					num1 = atoi(ins.substr(0,lpos).c_str());
 					reg1 = readReg(ins, lpos);
 				}
+
 				ins = ins.substr(fpos+2);
 				if (ins[0]=='$'){
 					num2 = atoi(ins.substr(1).c_str());
 					reg2 = ENM;
+				}else if(ins[0]=='%'){
+					num2 = 0;
+					reg2 = readReg(ins);
 				}else{
 					size_t lpos = ins.find('(');
-					num2 = aoti(ins.substr(0,lpos).c_str());
+					num2 = atoi(ins.substr(0,lpos).c_str());
 					reg2 = readReg(ins, lpos);
 				}
 			}
@@ -229,7 +236,7 @@ protected:
 			return EAX;
 			}
 		}
-		return EAX;
+		return ENM;
 	}
 	string readWord(const string& ins){
 		int i = 0;
