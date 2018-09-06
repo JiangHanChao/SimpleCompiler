@@ -26,12 +26,12 @@ class Symtab {
 public:
 	~Symtab();
 	void insert(std::string name, int lineno, int loc);
-	size_t lookup(std::string name);
+	static size_t lookup(std::string name);
 	CheckType lookType(std::string name);
 	void setType(std::string name, CheckType type);
 	void printTable();
 protected:
-	int hash(std::string key);
+	static int hash(std::string key);
 private:
 	static const int hash_size = 211;
 	static const int hash_shift = 4;

@@ -81,7 +81,7 @@ SyntaxNode* Syntax::opera_stmt(std::string id){
 	if(t!=NULL){
 		t->name = id;
 		t->attr.opt = token;
-		if(token>=PLUS && token <=OVERMINUASSG){
+		if(token>=PLUSASSG && token <=OVERMINUASSG){
 			t->ok = true;
 		}else{
 			syntaxError("unexpected token -> ");

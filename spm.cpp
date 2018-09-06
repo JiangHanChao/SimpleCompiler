@@ -10,17 +10,20 @@ using namespace std;
 // define of spm cosnt variable
 const static int mem_size  = 4;
 const static int stack_size = 1024*mem_size;
-const static int regs_size = 7;
-const static int insc_size = 13;
+const static int regs_size = 8;
+const static int insc_size = 14;
 
 enum RegType {
-	EAX=0, EBX, ECX, EDX, EBP, ESP, EIP, ENM=7
+	EAX=0, EBX, ECX, EDX, EBP, ESP, EIP, ENM, ENLL=8
 };
 enum INSCTYPE {
-	MOV=0, LOD, ADD, SUB, MUL, DIV, SHF, SHR, JMP, LEA, RET, HALT, LEAVE=12
+	MOV=0, LOD, ADD, SUB, MUL, DIV, SHF, SHR, JMP, LEA, RET, CALL, HALT, LEAVE=13
+};
+enum INTERRUPT {
+	OUT=0
 };
 const char* const INSCTAB[] = {
-	"MOV","LOD","ADD","SUB","MUL","DIV","SHF","SHR","JMP","LEA","RET","HALT","LEAVE"
+	"MOV","LOD","ADD","SUB","MUL","DIV","SHF","SHR","JMP","LEA","RET","CALL","HALT","LEAVE"
 };
 
 typedef struct{
@@ -167,6 +170,14 @@ protected:
 			if (t == RET || t == LEAVE){
 				num1 = num2 = 0;
 				reg1 = reg2 = EAX;
+			}else if(t == CALL){
+				match(ins, "CALL\t");
+				if (ins.compare("OUT")==0){
+					num1 = 0; reg1=ENM;
+				}else
+					callerr();
+				num2 = 0;
+				reg2 = ENLL;
 			}else{
 				match(ins, INSCTAB[(int)t]+'\t');
 				size_t fpos = ins.find(',');
@@ -247,6 +258,15 @@ protected:
 			return ins;
 		else
 			return ins.substr(0,i);
+	}
+	void call_interrupt(INTERRUPT sgm){
+		switch(sgm){
+		case OUT:
+			//TODO cout %esp value
+		break;
+		default:
+		break;
+		}
 	}
 private:
 	size_t* stack = NULL;

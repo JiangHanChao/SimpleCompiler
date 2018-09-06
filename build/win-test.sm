@@ -7,5 +7,57 @@
 001	MOV	$0,	%eax
 002	LOD	%eip
 003	MOV	$0,	%ebp
-004	HALT	$0,	$0
+**	-> assign
+004	MOV	$7,	%eax
+005	MOV	%eax,	%ebx
+006	MOV	$1,	%eax
+007	ADD	%ebx,	%eax
+008	MOV	%eax,	%ebp
+**	store assign result to a
+**	<- assign
+009	MOV	$0,	%eax
+**	-> assign
+010	MOV	%ebp,	%eax
+011	MOV	%eax,	1(%ebp)
+**	store assign result to b
+**	<- assign
+012	MOV	$0,	%eax
+**	-> assign
+013	MOV	$8,	%eax
+014	MOV	%eax,	%ebx
+015	MOV	%ebp,	%eax
+016	MOV	%eax,	%ecx
+017	MOV	1(%ebp),	%eax
+018	MUL	%ecx,	%eax
+019	ADD	%ebx,	%eax
+020	MOV	%eax,	2(%ebp)
+**	store assign result to c
+**	<- assign
+021	MOV	$0,	%eax
+**	-> operator
+022	MOV	$3,	%eax
+023	MOV	2(%ebp),	%ebx
+024	MUL	%eax,	%ebx
+025	MOV	%ebx,	2(%ebp)
+**	<- operator
+026	MOV	$0,	%eax
+**	-> operator
+027	MOV	$8,	%eax
+028	MOV	2(%ebp),	%ebx
+029	MOV	%ebx,	%ecx
+030	DIV	%eax,	%ecx
+031	ADD	%ecx,	%ebx
+032	MOV	%ebx,	2(%ebp)
+**	<- operator
+033	MOV	$0,	%eax
+**	-> output
+034	MOV	%ebp,	%eax
+035	MOV	%eax,	%ebx
+036	MOV	2(%ebp),	%eax
+037	ADD	%ebx,	%eax
+038	MOV	%eax,	%esp
+039	CALL	OUT
+**	<- output
+040	MOV	$0,	%eax
+041	HALT	$0,	$0
 **	END of File comment

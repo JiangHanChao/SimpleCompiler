@@ -27,8 +27,7 @@ private:
 	void emitInfo(std::string info);
 	void emitComment(std::string msg);
 	void emitRM(std::string opt,int num,RegType type,int num2,RegType type2);
-	void emitRO();
-	void emitSkip();
+	void emitCall(std::string interrupt);
 };
 
 

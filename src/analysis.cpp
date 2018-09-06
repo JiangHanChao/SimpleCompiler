@@ -154,7 +154,7 @@ void Analysis::InsertNode(SyntaxNode* t){
 			case OperaType:
 			case AssignType:
 				if (!t->name.empty() && t->ok){
-					if (st.lookup(t->name) == -1){
+					if (Symtab::lookup(t->name) == -1){
 						st.insert(t->name, t->linenum, location++);
 					}else{
 						st.insert(t->name, t->linenum, 0);
@@ -169,7 +169,7 @@ void Analysis::InsertNode(SyntaxNode* t){
 			switch(t->nodeKind.exp){
 			case IdType:
 				if (!t->name.empty() && t->ok){
-					if (st.lookup(t->name) == -1){
+					if (Symtab::lookup(t->name) == -1){
 						st.insert(t->name, t->linenum, location++);
 					}else{
 						st.insert(t->name, t->linenum, 0);
