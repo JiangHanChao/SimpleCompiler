@@ -30,6 +30,7 @@ public:
 	CheckType lookType(std::string name);
 	void setType(std::string name, CheckType type);
 	void printTable();
+	static int getTableSize();
 protected:
 	static int hash(std::string key);
 private:

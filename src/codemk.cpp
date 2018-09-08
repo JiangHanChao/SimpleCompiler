@@ -177,6 +177,7 @@ void Codemk::CodeGEN(SyntaxNode* tree){
 	emitRM("MOV", 0, ENM, 0, EAX);
 	emitRM("LOD", 0, EIP, 0, ENLL);
 	emitRM("MOV", 0, ENM, 0, EBP);
+	emitRM("MOV", Symtab::getTableSize()+2, ENM, 0, ESP);
 	cGEN(tree);
 	emitRM("RET", 0, ENLL, 0, ENLL);
 	emitRM("HALT", 0, ENM, 0, ENM);

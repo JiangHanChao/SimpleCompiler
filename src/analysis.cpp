@@ -127,6 +127,19 @@ void Symtab::printTable(){
 	cout.unsetf(ios::left);
 }
 
+int Symtab::getTableSize(){
+	int size=0;
+	for(int i=0; i<hash_size; i++)
+		if(HASHTABLE[i]!=NULL){
+			BucketList* bl = HASHTABLE[i];
+			while(bl != NULL){
+				bl = bl->next;
+				size++;
+			}
+		}
+	return size;
+}
+
 void Analysis::BuildSymTable(SyntaxNode* tree){
 	tracelook(tree);
 	if(flag&0x00000800){
