@@ -22,6 +22,9 @@ enum INSCTYPE {
 enum INTERRUPT {
 	OUT=0
 };
+const char* const REGTAB[] = {
+	"%eax","%ebx","%ecx","%edx","%ebp","%esp","%eip","num","NULL"
+};
 const char* const INSCTAB[] = {
 	"MOV","LOD","ADD","SUB","MUL","DIV","SHF","SHR","JMP","LEA","RET","CALL","HALT","LEAVE"
 };
@@ -116,18 +119,255 @@ public:
 	}
 	bool docmd(void){
 		string input;
+		RegType reg;
+		int len;
 		std::getline(cin, input);
-		if (input.length() != 1){
+		if (input[0]!='p' && input.length() != 1){
 			cout<<"Unexcepted input command."<<endl<<endl;
 			return true;
 		}
-
-		if (!input.compare("q")){
+		char op = input[0];
+		switch(op){
+		case 'h':
+			cout<<"cmd :"<<endl;
+			cout<<"h	help: for command list"<<endl;
+			cout<<"q	quit: exit the SPM simulation"<<endl;
+			cout<<"r	run : run the code in the simulation"<<endl;
+			cout<<"n/s	next/setp: run one instruction in SPM"<<endl;
+			cout<<"p	print: watch the regiest value by name. Exp: p %eax"<<endl;
+			break;
+		case 'r':
+			runAll();
+		case 'q':
 			return false;
+		case 'n':
+		case 's':
+			run();
+			break;
+		case 'p':
+			len=input.length()-1;
+			for(int i=1; i<len; i++)
+				if(input[i]==' '&&input[i+1]!=' '){
+					input = input.substr(i+1);
+					break;
+				}else if(i==len-1){
+					cout<<"'p' arguments not given."<<endl;
+					return true;
+				}
+			reg = readReg(input);
+			cout<<input;
+			if(error){
+				cout<<" not a vaild regeister."<<endl;
+				error = false;
+			}else{
+				printReg(reg);
+			}
+			break;
+		default:
+			cout<<"command '"<<op<<"' not found. input 'h' for help."<<endl;
+			break;
 		}
-		return true;
+		return ret;
 	}
 protected:
+	void checkFlag(){
+		if(eflag&0x8){
+			if(!(eflag&0x1))cout<<"exit uncorrect..."<<endl;
+			ret = false;
+		}
+	}
+	void printReg(RegType tp){
+		cout<<" :"<<regs[tp]<<endl;
+	}
+	void runAll(){
+		while(ret) run();
+	}
+	void run(){
+		INSTRUCTION curr = text[eip];
+		if(pause) execute(curr);
+		else{
+			if(eip==0){
+				if(curr.iop==MOV && curr.ireg2==EAX){
+					eflag = 1;
+					execute(curr);
+				}
+			}else if(eip==1){
+				if(curr.iop==LOD && curr.ireg1==EIP){
+					pause = true;
+				}
+			}else if(eip+1==text_size){
+				execute(curr);
+			}
+		}
+		checkFlag();
+		eip++;
+	}
+	void execute(INSTRUCTION ins){
+		if(eip >= text_size){
+			cout<<"EIP "<<eip<<": over than code text length."<<endl;
+			eflag = 8;
+			return ;
+		}
+		switch(ins.iop){
+		case MOV:
+			if(ins.ireg1==ENM){
+				if(ins.ireg2 <= EDX){
+					regs[ins.ireg2] = ins.inum1;
+				}else if(ins.ireg2 <= ESP){
+					stack[regs[ins.ireg2]+ins.inum2] = ins.inum1;
+				}else if(ins.ireg2==EIP){
+					eip = ins.inum1;
+				}else{
+					eflag=0;
+				}
+			}else if(ins.ireg1 <= EDX){
+				if(ins.ireg2 <= EDX)
+					regs[ins.ireg2] = regs[ins.ireg1];
+				else if(ins.ireg2 <= ESP){
+					stack[regs[ins.ireg2]+ins.inum2] = regs[ins.ireg1];
+				}else
+					eip = regs[ins.ireg1];
+			}else if(ins.ireg1 <= ESP){
+				if(ins.ireg2 <= EDX)
+					regs[ins.ireg2] = stack[regs[ins.ireg1]+ins.inum1];
+				else if(ins.ireg2 <= ESP)
+					stack[regs[ins.ireg2]+ins.inum2] = stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eip = stack[regs[ins.ireg1]+ins.inum1];
+			}else
+				eflag = 0;
+			break;
+		case LOD:
+			if(ins.ireg1 != EAX)
+				regs[ins.ireg1] = regs[EAX];
+			else
+				eflag = 0;
+			break;
+		case ADD:
+			if(ins.ireg2==EBP || ins.ireg2==ESP){
+				if(ins.ireg1 <= EDX)
+					stack[regs[ins.ireg2]+ins.inum2] += regs[ins.ireg1];
+				else if(ins.ireg1 <= ESP)
+					stack[regs[ins.ireg2]+ins.inum2] += stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eflag = 0;
+			}else if(ins.ireg2 <= EDX){
+				if(ins.ireg1 <= EDX)
+					regs[ins.ireg2] += regs[ins.ireg1];
+				else if(ins.ireg1 <= ESP)
+					regs[ins.ireg2] += stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eflag = 0;
+			}else
+				eflag = 0;
+			break;
+		case SUB:
+			if(ins.ireg2==EBP || ins.ireg2==ESP){
+				if(ins.ireg1 <= EDX)
+					stack[regs[ins.ireg2]+ins.inum2] -= regs[ins.ireg1];
+				else if(ins.ireg1 <= ESP)
+					stack[regs[ins.ireg2]+ins.inum2] -= stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eflag = 0;
+			}else if(ins.ireg2 <= EDX){
+				if(ins.ireg1 <= EDX)
+					regs[ins.ireg2] -= regs[ins.ireg1];
+				else if(ins.ireg1 <= ESP)
+					regs[ins.ireg2] -= stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eflag = 0;
+			}else
+				eflag = 0;
+			break;
+		case MUL:
+			if(ins.ireg2==EBP || ins.ireg2==ESP){
+				if(ins.ireg1 <= EDX)
+					stack[regs[ins.ireg2]+ins.inum2] *= regs[ins.ireg1];
+				else if(ins.ireg1 <= ESP)
+					stack[regs[ins.ireg2]+ins.inum2] *= stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eflag = 0;
+			}else if(ins.ireg2 <= EDX){
+				if(ins.ireg1 <= EDX)
+					regs[ins.ireg2] *= regs[ins.ireg1];
+				else if(ins.ireg1 <= ESP)
+					regs[ins.ireg2] *= stack[regs[ins.ireg1]+ins.inum1];
+				else
+					eflag = 0;
+			}else
+				eflag = 0;
+			break;
+		case DIV:
+			if(ins.ireg2==EBP || ins.ireg2==ESP){
+				if(ins.ireg1 <= EDX){
+					if(regs[ins.ireg1] == 0){
+						cout<<"DIV : zero divide overflow error."<<endl;
+						eflag = 0;
+					}else
+						stack[regs[ins.ireg2]+ins.inum2] /= regs[ins.ireg1];
+				}else if(ins.ireg1 <= ESP){
+					if(stack[regs[ins.ireg1]+ins.inum1]==0){
+						cout<<"DIV : zero divide overflow error."<<endl;
+						eflag = 0;
+					}else
+						stack[regs[ins.ireg2]+ins.inum2] /= stack[regs[ins.ireg1]+ins.inum1];
+				}
+				else
+					eflag = 0;
+			}else if(ins.ireg2 <= EDX){
+				if(ins.ireg1 <= EDX){
+					if(regs[ins.ireg1]==0){
+						cout<<"DIV : zero divide overflow error."<<endl;
+						eflag = 0;
+					}else
+						regs[ins.ireg2] /= regs[ins.ireg1];
+				}else if(ins.ireg1 <= ESP){
+					if(stack[regs[ins.ireg1]+ins.inum1]==0){
+						cout<<"DIV : zero divide overflow error."<<endl;
+						eflag = 0;
+					}else
+						regs[ins.ireg2] /= stack[regs[ins.ireg1]+ins.inum1];
+				}else
+					eflag = 0;
+			}else
+				eflag = 0;
+			break;
+		case SHF:
+		case SHR:
+		case JMP:
+		case LEA:
+			break;
+		case LEAVE:
+		case RET:
+			if(ins.ireg1==ENLL && ins.ireg2==ENLL){
+				regs[EBP] = regs[ESP] = 0;
+				regs[EAX] = 0;
+				pause = false;
+			}else
+				eflag = 0;
+			break;
+		case CALL:
+			call_interrupt(OUT);
+			break;
+		case HALT:
+			eip = 0;
+			eflag = 9;
+			break;
+		default:
+			eflag = 1;
+			break;
+		}
+		cout<<"EIP "<<eip<<": ";
+		if(eflag&0x1){
+			if(ins.iop==RET || ins.iop==LEAVE)cout<<INSCTAB[ins.iop]<<endl;
+			else
+				cout<<INSCTAB[ins.iop]<<" "<<ins.inum1<<"("<<REGTAB[ins.ireg1]<<"), "
+					<<ins.inum2<<"("<<REGTAB[ins.ireg2]<<")"<<endl;
+		}else{
+			cout<<"instruction run error result."<<endl;
+			eflag = 1;
+		}
+	}
 	bool match(string& src, string rule){
 		if (src.empty() || rule.empty()){
 			return false;
@@ -169,7 +409,7 @@ protected:
 			text[i].iop = t;
 			if (t == RET || t == LEAVE){
 				num1 = num2 = 0;
-				reg1 = reg2 = EAX;
+				reg1 = reg2 = ENLL;
 			}else if(t == CALL){
 				match(ins, "CALL\t");
 				if (ins.compare("OUT")==0){
@@ -178,8 +418,15 @@ protected:
 					callerr();
 				num2 = 0;
 				reg2 = ENLL;
+			}else if(t == LOD){
+				match(ins, "LOD\t");
+				reg1 = readReg(ins);
+				num1 = num2 = 0;
+				reg2 = ENLL;
 			}else{
-				match(ins, INSCTAB[(int)t]+'\t');
+				string rule=INSCTAB[(int)t];
+				rule+="\t";
+				match(ins, rule);
 				size_t fpos = ins.find(',');
 				if (ins[0]=='$'){
 					num1 = atoi(ins.substr(1,fpos-1).c_str());
@@ -241,6 +488,9 @@ protected:
 			case 's':
 			if(ins[lpos+4]=='p')return ESP;
 			break;
+			case 'i':
+			if(ins[lpos+4]=='p')return EIP;
+			break;
 			default:
 			callerr();
 			cout<<"regeister read error"<<endl;
@@ -262,13 +512,15 @@ protected:
 	void call_interrupt(INTERRUPT sgm){
 		switch(sgm){
 		case OUT:
-			//TODO cout %esp value
+			cout<<"out: "<<stack[regs[ESP]]<<endl<<endl;
 		break;
 		default:
 		break;
 		}
 	}
 private:
+	bool ret = true;
+	bool pause = false;
 	size_t* stack = NULL;
 	INSTRUCTION* text = NULL;
 	size_t  eip  = 0;

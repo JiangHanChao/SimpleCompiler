@@ -1,0 +1,83 @@
+	.file	win-test1.sm
+	.comment
+**	Simple Compilation Compiler Code
+**	File standard infomation comment
+**	END of comment prelude.
+	.code
+001	MOV	$0,	%eax
+002	LOD	%eip
+003	MOV	$0,	%ebp
+**	-> assign
+004	MOV	$9,	%eax
+005	MOV	%eax,	%ebx
+006	MOV	$4,	%eax
+007	ADD	%ebx,	%eax
+008	MOV	%eax,	%ebp
+**	store assign result to num
+**	<- assign
+009	MOV	$0,	%eax
+**	-> assign
+010	MOV	%ebp,	%eax
+011	MOV	%eax,	%ecx
+012	MOV	%ebp,	%eax
+013	MUL	%ecx,	%eax
+014	MOV	%eax,	1(%ebp)
+**	store assign result to a
+**	<- assign
+015	MOV	$0,	%eax
+**	-> assign
+016	MOV	$1,	%eax
+017	MOV	%eax,	%ebx
+018	MOV	1(%ebp),	%eax
+019	MOV	%eax,	%ebx
+020	MOV	%ebp,	%eax
+021	ADD	%ebx,	%eax
+022	ADD	%ebx,	%eax
+023	MOV	%eax,	2(%ebp)
+**	store assign result to c
+**	<- assign
+024	MOV	$0,	%eax
+**	-> assign
+025	MOV	$1,	%eax
+026	MOV	%eax,	3(%ebp)
+**	store assign result to d
+**	<- assign
+027	MOV	$0,	%eax
+**	-> operator
+028	MOV	2(%ebp),	%eax
+029	MOV	3(%ebp),	%ebx
+030	MUL	%ebx,	%eax
+031	SUB	%eax,	%ebx
+032	MOV	%ebx,	3(%ebp)
+**	<- operator
+033	MOV	$0,	%eax
+**	-> operator
+034	MOV	%ebp,	%eax
+035	MOV	3(%ebp),	%ebx
+036	MOV	%ebx,	%ecx
+037	DIV	%eax,	%ecx
+038	ADD	%ecx,	%ebx
+039	MOV	%ebx,	3(%ebp)
+**	<- operator
+040	MOV	$0,	%eax
+**	-> output
+041	MOV	1(%ebp),	%eax
+042	MOV	%eax,	%esp
+043	CALL	OUT
+**	<- output
+044	MOV	$0,	%eax
+**	-> output
+045	MOV	2(%ebp),	%eax
+046	MOV	%eax,	%esp
+047	CALL	OUT
+**	<- output
+048	MOV	$0,	%eax
+**	-> output
+049	MOV	3(%ebp),	%eax
+050	MOV	%eax,	%esp
+051	CALL	OUT
+**	<- output
+052	MOV	$0,	%eax
+053	RET
+054	HALT	$0,	$0
+**	END of File comment

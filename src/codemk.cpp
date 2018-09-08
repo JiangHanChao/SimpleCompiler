@@ -178,6 +178,7 @@ void Codemk::CodeGEN(SyntaxNode* tree){
 	emitRM("LOD", 0, EIP, 0, ENLL);
 	emitRM("MOV", 0, ENM, 0, EBP);
 	cGEN(tree);
+	emitRM("RET", 0, ENLL, 0, ENLL);
 	emitRM("HALT", 0, ENM, 0, ENM);
 	emitComment("END of File comment");
 }

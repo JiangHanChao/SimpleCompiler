@@ -59,5 +59,6 @@
 039	CALL	OUT
 **	<- output
 040	MOV	$0,	%eax
-041	HALT	$0,	$0
+041	RET
+042	HALT	$0,	$0
 **	END of File comment
